@@ -1,0 +1,26 @@
+
+.heart{
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+@media (max-width: 1024px) {
+  .heart{
+    bottom: 5px;
+    right: 5px;
+  }
+  .heart_svg{
+    width: 30px;
+  }
+}
+
+@media (max-width: 450px) {
+  .heart{
+    bottom: 0px;
+    right: 5px;
+  }
+  .heart_svg{
+    width: 20px;
+  }
+}
