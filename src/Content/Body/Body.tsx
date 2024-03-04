@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import styles from './body.module.css';
 import { useCatsData } from '../../hooks/useCatsData';
 import { Image } from './Imags';
-import { useContext } from 'react';
-import { catsContext } from '../../context/catsContext';
+// import { useContext } from 'react';
+// import { catsContext } from '../../context/catsContext';
 
 interface IBodyProps {
   dataState: boolean;
@@ -11,8 +11,16 @@ interface IBodyProps {
 
 export function Body({ dataState }: IBodyProps) {
   const allCats = useCatsData();
-  const favCats = useContext(catsContext)?.imageList;
+  // const favCatsFree = useContext(catsContext)?.imageList;
 
+  const [favCats, setFavCats] = useState([]); 
+
+  useEffect(() => {
+    const favCatsFromStorage = localStorage.getItem('favCats');
+    if (favCatsFromStorage) {
+      setFavCats(JSON.parse(favCatsFromStorage));
+    }
+  }, [favCats,dataState]);
   const dataCats = dataState ? favCats : allCats;
 
   const [hoveredItem, setHoveredItem] = useState('');
@@ -25,10 +33,10 @@ export function Body({ dataState }: IBodyProps) {
     setHoveredItem('');
   };
   
-  useEffect(() => {
-    console.log("Updated imageList:", favCats);
-    // Другие действия, если необходимо
-  }, [favCats]);
+  // useEffect(() => {
+  //   console.log("Updated imageList:", favCats);
+  //   // Другие действия, если необходимо
+  // }, [favCats]);
   return (
     <ul className={styles.cats_list}>
       {dataCats.map((el) => {

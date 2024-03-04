@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import styles from './image.module.css';
 import { useContext } from 'react';
 import { catsContext } from '../../../context/catsContext';
@@ -13,36 +13,57 @@ interface IImageProps {
 
 export function Image({ hover, url, id }: IImageProps) {
   const [isActive, setIsActive] = useState(false);
-  const [defaultLink, setDefaultLink] = useState(false);
-
+  const [isInFavCats, setIsInFavCats] = useState(false);
   const context = useContext(catsContext);
-  
-  if (!hover && !defaultLink) {
+
+  useEffect(() => {
+    // Проверяем, содержится ли id в localStorage
+    const favCatsFromStorage = localStorage.getItem('favCats');
+    if (favCatsFromStorage) {
+      const favCatsArray = JSON.parse(favCatsFromStorage);
+      // Проверяем, есть ли текущий id в списке избранных
+      const isInLocalStorage = favCatsArray.some((cat: IImageProps) => cat.id === id);
+      setIsInFavCats(isInLocalStorage);
+    }
+  }, [id]);
+
+  if (!hover && !isInFavCats) {
     return null;
   }
 
   const handleClick = () => {
-    setDefaultLink(!defaultLink);
     if (context) {
-      const { imageList, addImage, removeImage } = context;
+      const { addImage, removeImage } = context;
       
-      const imageIndex = imageList.findIndex((image) => image.id === id);
-
-      if (imageIndex === -1) {
+      if (!isInFavCats) {
         addImage(id, url);
+        setIsInFavCats(true);
+        const favCatsFromStorage = localStorage.getItem('favCats');
+        if (!favCatsFromStorage) {
+          const newFavCats = [{ id, url }];
+          localStorage.setItem('favCats', JSON.stringify(newFavCats));
+        } else {
+          const favCatsArray = JSON.parse(favCatsFromStorage);
+          favCatsArray.push({ id, url });
+          localStorage.setItem('favCats', JSON.stringify(favCatsArray));
+        }
       } else {
         removeImage(id);
-      }  
+        setIsInFavCats(false);
+        const favCatsFromStorage = localStorage.getItem('favCats');
+        if (favCatsFromStorage) {
+          const favCatsArray = JSON.parse(favCatsFromStorage);
+          const updatedFavCatsArray = favCatsArray.filter((cat: IImageProps) => cat.id !== id);
+          localStorage.setItem('favCats', JSON.stringify(updatedFavCatsArray));
+        }
+      }
     }
     setIsActive(!isActive);
-    
   };
-
 
   return (
     <div className={styles.heart} onClick={handleClick}>
-      {defaultLink ? <Icon /> : <Icon_b />}
+      {isInFavCats ? <Icon /> : <Icon_b />}
     </div>
   );
 }
-
