@@ -17,11 +17,9 @@ export function Image({ hover, url, id }: IImageProps) {
   const context = useContext(catsContext);
 
   useEffect(() => {
-    // Проверяем, содержится ли id в localStorage
     const favCatsFromStorage = localStorage.getItem('favCats');
     if (favCatsFromStorage) {
       const favCatsArray = JSON.parse(favCatsFromStorage);
-      // Проверяем, есть ли текущий id в списке избранных
       const isInLocalStorage = favCatsArray.some((cat: IImageProps) => cat.id === id);
       setIsInFavCats(isInLocalStorage);
     }
